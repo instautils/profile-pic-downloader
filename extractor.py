@@ -1,8 +1,25 @@
 import os
 import sys
 import requests
+import time
 from tqdm import tqdm
 from instagram import Instagram
+import multiprocessing as multiprocessing
+
+
+def parallel_downloader(input_list):
+    processes = [
+        multiprocessing.Process(
+            target=extract_image,
+            args=(user,),
+        ) for user in input_list
+    ]
+
+    for p in processes:
+        p.start()
+
+    for p in processes:
+        p.join()
 
 
 def extract_image(user):
@@ -14,12 +31,12 @@ def extract_image(user):
         with open(path, 'wb') as handler:
             handler.write(r.content)
     except requests.exceptions.RequestException:
-        pass
+        return
 
 
 def application(instagram):
     followers = instagram.followers(instagram.username_id)
-    for follower in followers["users"]:
+    for follower in tqdm(followers["users"]):
         users = [follower]
         targets = instagram.followers(follower["pk"])
         if not targets:
@@ -32,8 +49,8 @@ def application(instagram):
         else:
             users.extend(targets["users"])
 
-        for user in tqdm(users):
-            extract_image(user)
+        parallel_downloader(users)
+        time.sleep(1)
 
 
 if __name__ == "__main__":
