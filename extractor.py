@@ -1,16 +1,20 @@
 import os
 import sys
-from urllib import urlretrieve
+import requests
+from tqdm import tqdm
 from instagram import Instagram
 
 
-def extract_image(user):
-    print "Downloading user {} profile ...".format(user["username"])
+def extract_image(user):    
     path = os.path.join('images', '{}.jpg'.format(user["username"]))
     if os.path.exists(path):
         return
-    urlretrieve(user["profile_pic_url"], path)
-
+    try:
+        r = requests.get(user["profile_pic_url"], allow_redirects=True)
+        with open(path, 'wb') as handler:
+            handler.write(r.content)
+    except requests.exceptions.RequestException:
+        pass
 
 def application(instagram):
     followers = instagram.followers(instagram.username_id)
@@ -27,22 +31,22 @@ def application(instagram):
         else:
             users.extend(targets["users"])
 
-        for user in users:
+        for user in tqdm(users):
             extract_image(user)
 
 
 if __name__ == "__main__":
     instagram = Instagram(
-        username=os.getenv('INSTAGRAM_USERNAME'),
-        password=os.getenv('INSTAGRAM_PASSWORD'),
+        username=os.getenv('INSTAGRAPH_USERNAME'),
+        password=os.getenv('INSTAGRAPH_PASSWORD'),
     )
     if not instagram.login():
         print "Couldn't sign-in into Instagram."
         sys.exit(1)
-    
+
     if not os.path.exists('images'):
         os.mkdir('images')
-    
+
     try:
         application(instagram)
     except BaseException as e:
