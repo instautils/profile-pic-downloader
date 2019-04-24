@@ -5,7 +5,7 @@ from tqdm import tqdm
 from instagram import Instagram
 
 
-def extract_image(user):    
+def extract_image(user):
     path = os.path.join('images', '{}.jpg'.format(user["username"]))
     if os.path.exists(path):
         return
@@ -15,6 +15,7 @@ def extract_image(user):
             handler.write(r.content)
     except requests.exceptions.RequestException:
         pass
+
 
 def application(instagram):
     followers = instagram.followers(instagram.username_id)
@@ -37,8 +38,8 @@ def application(instagram):
 
 if __name__ == "__main__":
     instagram = Instagram(
-        username=os.getenv('INSTAGRAPH_USERNAME'),
-        password=os.getenv('INSTAGRAPH_PASSWORD'),
+        username=os.getenv('INSTAGRAM_USERNAME'),
+        password=os.getenv('INSTAGRAM_PASSWORD'),
     )
     if not instagram.login():
         print "Couldn't sign-in into Instagram."
