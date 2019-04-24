@@ -9,7 +9,6 @@ target_directory = 'labels'
 labels = {
     'm': 'male',
     'f': 'female',
-    'u': 'unknown'
 }
 
 
