@@ -55,8 +55,8 @@ def application(instagram):
 
 if __name__ == "__main__":
     instagram = Instagram(
-        username=os.getenv('INSTAGRAM_USERNAME'),
-        password=os.getenv('INSTAGRAM_PASSWORD'),
+        username=os.getenv('INSTAGRAM_USERNAME', ''),
+        password=os.getenv('INSTAGRAM_PASSWORD', ''),
     )
     if not instagram.login():
         print "Couldn't sign-in into Instagram."
